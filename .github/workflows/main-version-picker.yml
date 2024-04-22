@@ -1,0 +1,80 @@
+# This workflow will build a Java project with Ant
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-ant
+
+name: Build with custom Java and Lucee
+
+on:   # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      lucee_version_query:
+        required: true
+        type: string
+        default: '0/all/light'
+      java_version:
+        required: true
+        type: string
+        default: "21"
+  # Triggers the workflow on push or pull request events but only for the master branch
+  workflow_call:
+    inputs:
+      lucee_version_query:
+        required: true
+        type: string
+        default: '0/all/light'
+      java_version:
+        required: true
+        type: string
+        default: "21"
+  repository_dispatch:
+    types: [build-installers]
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      luceeVersion: ${{ inputs.lucee_version_query }}
+      luceeVersionQuery: 0/all/light
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up JDK ${{ inputs.java_version }}
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ inputs.java_version }}
+        distribution: 'adopt'
+    - name: Cache Maven packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2
+        key: lucee-script-runner-maven-cache
+        enableCrossOsArchive: true
+    - name: Cache Lucee files
+      uses: actions/cache@v4
+      with:
+        path: ~/work/_actions/lucee/script-runner/main/lucee-download-cache
+        key: lucee-downloads
+        enableCrossOsArchive: true
+    - name: Build with Ant
+      run: ant -noinput -verbose -buildfile build.xml
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: image-lex
+        path: dist/*.lex
+    - name: Checkout Lucee
+      uses: actions/checkout@v4
+      with:
+        repository: lucee/lucee
+        path: lucee
+    - name: Run Lucee Test Suite (testFilter="argon2")
+      uses: lucee/script-runner@main
+      with:
+        webroot: ${{ github.workspace }}/lucee/test
+        execute: /bootstrap-tests.cfm
+        luceeVersion: ${{ env.luceeVersion }}
+        luceeVersionQuery: ${{ env.luceeVersionQuery }}
+        extensionDir: ${{ github.workspace }}/dist
+      env:
+        testLabels: argon2
+        testAdditional: ${{ github.workspace }}/tests

@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Export-Package: org.lucee.extension.argon2
+Bundle-ManifestVersion: 2
+Require-Bundle: org.lucee.argon2;bundle-version=2.11.0,
+ org.lucee.argon2-jvm-nolibs;bundle-version=2.11.0,
+ com.sun.jna;bundle-version=5.8.0

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE func-lib PUBLIC "-//Railo//DTD CFML Function Library 1.0//EN"
+	"dtd/web-cfmfunctionlibrary_1_0.dtd">
+<!-- http://www.getrailo.com/j2ee/dtd/web-jspfunctionlibrary_1_0.dtd -->
+<func-lib>
+	<flib-version>1.00</flib-version>
+	<short-name>Argon2</short-name>
+	<uri>http://extension.lucee.org/function/argon2</uri>
+	<display-name>Argon2</display-name>
+	<description>
+		Functions to interact with Argon2 functions
+	</description>
+
+
+    <function>
+		<name>GenerateArgon2Hash</name>
+		<class bundle-name="{bundle-name}" bundle-version="{bundle-version}">org.lucee.extension.argon2.GenerateArgon2Hash</class>
+		<introduced>5.3.8.18</introduced>
+		<description>Returns hash of input using Argon2.</description>
+    	<argument>
+			<name>input</name>
+			<type>string</type>
+			<required>Yes</required>
+			<description>Input string.</description>
+    	</argument>
+    	<argument>
+			<name>variant</name>
+			<type>string</type>
+			<required>No</required>
+			<default>argon2i</default>
+			<description>Either Argon2i or Argon2d</description>
+			<introduced>5.3.8.43</introduced>
+    	</argument>
+    	<argument>
+			<name>parallelismFactor</name>
+			<type>number</type>
+			<required>No</required>
+			<default>1</default>
+			<description>Degrees of parallelism, a number between 1 and 10.</description>
+    	</argument>
+    	<argument>
+			<name>memoryCost</name>
+			<type>number</type>
+			<required>No</required>
+			<default>8</default>
+			<description>A number between 8 and 100000.</description>
+    	</argument>
+    	<argument>
+			<name>iterations</name>
+			<type>number</type>
+			<required>No</required>
+			<default>1</default>
+			<description>A number between 1 and 20.</description>
+    	</argument>
+    	<return>
+    		<type>string</type>
+    	</return>
+    </function>
+    
+    <function>
+		<name>Argon2CheckHash</name>
+		<class bundle-name="{bundle-name}" bundle-version="{bundle-version}">org.lucee.extension.argon2.Argon2CheckHash</class>
+		<introduced>5.3.8.43</introduced>
+		<description>Returns hash of input using Argon2.</description>
+    	<argument>
+			<name>input</name>
+			<type>string</type>
+			<required>Yes</required>
+			<description>Input string.</description>
+    	</argument>
+    	<argument>
+			<name>hash</name>
+			<type>string</type>
+			<required>Yes</required>
+			<description>The hash of input.</description>
+    	</argument>
+    	<return>
+    		<type>boolean</type>
+    	</return>
+    </function>
+</func-lib>

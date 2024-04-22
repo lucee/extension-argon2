@@ -1,4 +1,4 @@
-component extends="org.lucee.cfml.test.LuceeTestCase" labels="s3" {
+component extends="org.lucee.cfml.test.LuceeTestCase" labels="argon2" {
 	function run( testResults , testBox ) {
 		describe( title="Test suite for Argon2CheckHash()", body=function() {
 			it(title="check Argon2CheckHash", body = function( currentSpec ) {

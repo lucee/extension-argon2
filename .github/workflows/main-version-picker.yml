@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       luceeVersion: ${{ inputs.lucee_version_query }}
-      luceeVersionQuery: 0/all/light
+      luceeVersionQuery: ${{ inputs.lucee_version_query }}
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK ${{ inputs.java_version }}

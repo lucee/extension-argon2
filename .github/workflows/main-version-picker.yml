@@ -13,7 +13,7 @@ on:   # Allows you to run this workflow manually from the Actions tab
       java_version:
         required: true
         type: string
-        default: "21"
+        default: "11"
   # Triggers the workflow on push or pull request events but only for the master branch
   workflow_call:
     inputs:
@@ -24,11 +24,7 @@ on:   # Allows you to run this workflow manually from the Actions tab
       java_version:
         required: true
         type: string
-        default: "21"
-  repository_dispatch:
-    types: [build-installers]
-  push:
-  pull_request:
+        default: "11"
 
 jobs:
   build:

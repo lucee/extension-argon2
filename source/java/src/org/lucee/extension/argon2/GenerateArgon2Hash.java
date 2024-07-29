@@ -42,8 +42,12 @@ public class GenerateArgon2Hash extends BIF {
 				case "argon2d":
 					variant = Argon2Types.ARGON2d;
 					break;
+				case "argon2id":
+					variant = Argon2Types.ARGON2id;
+					break;
 				default:
-					throw eng.getExceptionUtil().createFunctionException(pc, "GenerateArgon2Hash", 1, "variant", "The Variant should be ARGON2i or ARGON2d", null);
+					throw eng.getExceptionUtil().createFunctionException(pc, "GenerateArgon2Hash", 1, "variant", 
+						"The Variant should be ARGON2i, ARGON2id or ARGON2d, was [" + tmp + "]" , null);
 				}
 			}
 			else variant = null;
@@ -54,7 +58,8 @@ public class GenerateArgon2Hash extends BIF {
 		if (args.length > 2) {
 			parallelismFactor = cast.toIntValue(args[2]);
 			if (parallelismFactor < 1 || parallelismFactor > 10) {
-				throw eng.getExceptionUtil().createFunctionException(pc, "GenerateArgon2Hash", 2, "parallelismFactor", "The parallelism factor value should be between 1 and 10",
+				throw eng.getExceptionUtil().createFunctionException(pc, "GenerateArgon2Hash", 2, "parallelismFactor", 
+					"The parallelism factor value should be between 1 and 10, was [" + parallelismFactor + "]",
 						null);
 			}
 		}
@@ -64,7 +69,8 @@ public class GenerateArgon2Hash extends BIF {
 		if (args.length > 3) {
 			memory = cast.toIntValue(args[3]);
 			if (memory < 8 || memory > 100000) {
-				throw eng.getExceptionUtil().createFunctionException(pc, "GenerateArgon2Hash", 3, "memoryCost", "The memory cost value should be between 8 and 100000", null);
+				throw eng.getExceptionUtil().createFunctionException(pc, "GenerateArgon2Hash", 3, "memoryCost", 
+					"The memory cost value should be between 8 and 100000, was [" + memory + "]", null);
 			}
 		}
 
@@ -73,7 +79,8 @@ public class GenerateArgon2Hash extends BIF {
 		if (args.length > 4) {
 			iterations = cast.toIntValue(args[4]);
 			if (iterations < 1 || iterations > 20) {
-				throw eng.getExceptionUtil().createFunctionException(pc, "GenerateArgon2Hash", 4, "iterations", "The iterations value should be between 1 and 20", null);
+				throw eng.getExceptionUtil().createFunctionException(pc, "GenerateArgon2Hash", 4, "iterations", 
+					"The iterations value should be between 1 and 20, was [" + iterations + "]", null);
 			}
 		}
 

@@ -29,7 +29,7 @@ public class Argon2CheckHash extends BIF {
 		Argon2Types type;
 		String variant = getVariant(pc, hash);
 		if (Util.isEmpty(variant, true))
-			throw eng.getExceptionUtil().createFunctionException(pc, "GenerateArgon2Hash", 1, "variant", "The Variant should be ARGON2i or ARGON2d", null);
+			throw eng.getExceptionUtil().createFunctionException(pc, "GenerateArgon2Hash", 1, "variant", "The Variant should be ARGON2i, ARGON2id or ARGON2d", null);
 		variant = variant.trim();
 		switch (variant.toLowerCase()) {
 		case "argon2i":
@@ -38,8 +38,13 @@ public class Argon2CheckHash extends BIF {
 		case "argon2d":
 			type = Argon2Types.ARGON2d;
 			break;
+		case "argon2id":
+			type = Argon2Types.ARGON2id;
+			break;
+		
 		default:
-			throw eng.getExceptionUtil().createFunctionException(pc, "Argon2CheckHash", 1, "variant", "The Variant should be ARGON2i or ARGON2d", null);
+			throw eng.getExceptionUtil().createFunctionException(pc, "Argon2CheckHash", 1, "variant", 
+				"The Variant should be ARGON2i, ARGON2id or ARGON2d, was [" + variant + "]", null);
 		}
 		Argon2 argon2 = Argon2Factory.create(type);
 		char[] carrInput = input == null ? new char[0] : input.toCharArray();

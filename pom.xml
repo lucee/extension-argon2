@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.lucee</groupId>
     <artifactId>argon2-extension</artifactId>
-    <version>1.0.0.8-SNAPSHOT</version>
+    <version>1.0.0.7</version>
     <packaging>pom</packaging>
     <name>Argon2 Extension</name>
 
@@ -51,7 +51,8 @@
         </developer>
     </developers>
 
-    <description>Argon2 password hashing extension with configurable security parameters for Lucee Server</url>
+    <description>Argon2 password hashing extension with configurable security parameters for Lucee Server</description>
+    <url>https://github.com/lucee/extension-argon2</url>
 
     <profiles>
         <profile>

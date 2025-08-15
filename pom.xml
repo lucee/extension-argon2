@@ -51,8 +51,7 @@
         </developer>
     </developers>
 
-    <description>A security extension that implements the Argon2 password hashing algorithm for Lucee Server applications. Provides modern, cryptographically secure password hashing using the award-winning Argon2 algorithm (winner of the 2015 Password Hashing Competition). Features configurable memory cost, time cost, and parallelism parameters for optimal security-performance balance. Ideal for applications requiring state-of-the-art password storage and verification with protection against GPU cracking attacks and side-channel attacks.</description>
-    <url>https://github.com/lucee/extension-argon2</url>
+    <description>Argon2 password hashing extension with configurable security parameters for Lucee Server</url>
 
     <profiles>
         <profile>

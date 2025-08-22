@@ -10,7 +10,7 @@
 	<classpathentry kind="lib" path="libs/javax.servlet-api-3.1.0.jar"/>
 	<classpathentry kind="lib" path="libs/jsp-api-2.2.jar"/>
 	<classpathentry kind="lib" path="libs/lucee.jar"/>
-	<classpathentry kind="lib" path="libs/org.lucee.argon2-2.11.0.jar"/>
-	<classpathentry kind="lib" path="libs/org.lucee.argon2-jvm-nolibs-2.11.0.jar"/>
+	<classpathentry kind="lib" path="libs/org.lucee.argon2-2.12.0.jar"/>
+	<classpathentry kind="lib" path="libs/org.lucee.argon2-jvm-nolibs-2.12.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

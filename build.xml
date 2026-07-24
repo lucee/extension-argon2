@@ -79,9 +79,25 @@ start-bundles: false
 
   <target name="dist" depends="compile"
         description="generate the distribution" >
-    
- 
-    <!-- Put everything in ${build} into .jar file -->
+
+    <!-- Extract native libraries from argon2 JAR INTO the build directory
+         so they get bundled inside the extension JAR itself.
+         This is critical: Lucee's OSGi classloader can only see resources
+         inside the same JAR as the calling class. -->
+    <unzip src="${lib}/org.lucee.argon2-2.12.0.jar" dest="${build}">
+      <patternset>
+        <include name="win32-x86-64/**"/>
+        <include name="win32-x86/**"/>
+        <include name="linux-x86-64/**"/>
+        <include name="linux-x86/**"/>
+        <include name="linux-aarch64/**"/>
+        <include name="linux-arm/**"/>
+        <include name="darwin-x86-64/**"/>
+        <include name="darwin-aarch64/**"/>
+      </patternset>
+    </unzip>
+
+    <!-- Put everything in ${build} into .jar file (classes + native libs) -->
     <jar 
     	jarfile="${dist}/extension/jars/${filename}-${bundleversion}.jar" basedir="${build}"  manifest="${src}/META-INF/MANIFEST.MF">
       <manifest>

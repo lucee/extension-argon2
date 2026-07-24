@@ -20,7 +20,7 @@ public class GenerateArgon2Hash extends BIF {
 		CFMLEngine eng = CFMLEngineFactory.getInstance();
 
 		if (args.length < 1 || args.length > 5) {
-			throw eng.getExceptionUtil().createFunctionException(pc, "GenerateArgon2Hash", 5, 5, args.length);
+			throw eng.getExceptionUtil().createFunctionException(pc, "GenerateArgon2Hash", 1, 5, args.length);
 		}
 
 		Decision dec = eng.getDecisionUtil();
@@ -50,7 +50,7 @@ public class GenerateArgon2Hash extends BIF {
 						"The Variant should be ARGON2i, ARGON2id or ARGON2d, was [" + tmp + "]" , null);
 				}
 			}
-			else variant = null;
+			else variant = Argon2Types.ARGON2i;
 		}
 
 		// parallelismFactor
@@ -84,6 +84,7 @@ public class GenerateArgon2Hash extends BIF {
 			}
 		}
 
+		NativeLoader.ensureLoaded();
 		Argon2 argon2 = Argon2Factory.create(variant);
 
 		char[] carrInput = input == null ? new char[0] : input.toCharArray();

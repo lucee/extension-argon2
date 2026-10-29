@@ -1,4 +1,5 @@
 /dist
+temp
 **/Test.java
 **/TestCase.java
 **/.DS_Store
@@ -10,3 +11,4 @@ target
 target/*
 *.lock
 *.DS_Store
+**/.flattened-pom.xml

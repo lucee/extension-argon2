@@ -14,7 +14,7 @@
 
     <function>
 		<name>GenerateArgon2Hash</name>
-		<class bundle-name="{bundle-name}" bundle-version="{bundle-version}">org.lucee.extension.argon2.GenerateArgon2Hash</class>
+		<class maven="{maven}">org.lucee.extension.argon2.GenerateArgon2Hash</class>
 		<introduced>5.3.8.18</introduced>
 		<description>Returns hash of input using Argon2.</description>
     	<argument>
@@ -59,7 +59,7 @@
     
     <function>
 		<name>Argon2CheckHash</name>
-		<class bundle-name="{bundle-name}" bundle-version="{bundle-version}">org.lucee.extension.argon2.Argon2CheckHash</class>
+		<class maven="{maven}">org.lucee.extension.argon2.Argon2CheckHash</class>
 		<introduced>5.3.8.43</introduced>
 		<description>Returns hash of input using Argon2.</description>
     	<argument>

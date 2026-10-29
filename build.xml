@@ -1,58 +1,107 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project default="clean" basedir="." name="argon2-extension">
-	<description>
+  <description>
         Build Argon2 Extension
     </description>
-    <!-- set global properties for this build -->
-  
+  <!-- set global properties for this build -->
 
-  <property name="lib" location="source/java/libs"/>
-  <property name="src" location="source/java/src"/>
   <property name="srcImg" location="source/images"/>
   <property name="temp" location="temp"/>
-  <property name="build" location="build"/>
   <property name="dist"  location="target"/>
 
-  <property name="tld" location="source/tld"/>
   <property name="fld" location="source/fld"/>
 
-  <path id="classpath">
-    <fileset dir="${lib}">
-      <include name="**/*.jar" />
-    </fileset>
-  </path>
-
   <target name="init">
-    <!-- Create the time stamp -->
-    <tstamp/>
-    
     <delete dir="${temp}"/>
-    <delete dir="${dist}"/>
-
-    <!-- Create the build directory structure used by compile -->
     <mkdir dir="${temp}"/>
-    <mkdir dir="${build}"/>
     <mkdir dir="${dist}/"/>
-
-
   </target>
 
+  <!-- build the org.lucee:argon2-functions jar with Maven (deployed to Maven Central on deploy) -->
+  <target name="maven-build" depends="init">
 
-  <target name="copy" depends="init" description="copy source file to temp" >
-    <!-- copy the source -->
-    <copy todir="${temp}">
-      <fileset dir="${src}">
-        <include name="**/*.java"/>
-        <exclude name="**/Test.java"/>
-        <exclude name="**/TestCase.java"/>
+    <condition property="is.deploy" value="true" else="false">
+      <equals arg1="${maven.goal}" arg2="deploy"/>
+    </condition>
+
+    <!-- Check if artifact already exists in Maven Central -->
+    <condition property="artifact.exists">
+      <and>
+        <equals arg1="${is.deploy}" arg2="true"/>
+        <http url="https://repo1.maven.org/maven2/${mvnGroupPath}/${mvnArtifactId}/${bundleversion}/${mvnArtifactId}-${bundleversion}.pom"/>
+      </and>
+    </condition>
+
+    <!-- Set effective goal based on whether artifact exists -->
+    <condition property="effective.goal" value="install" else="${maven.goal}">
+      <equals arg1="${artifact.exists}" arg2="true"/>
+    </condition>
+
+    <echo>goal:${maven.goal}</echo>
+    <echo>effective.goal:${effective.goal}</echo>
+    <echo>performRelease:${is.deploy}</echo>
+    <echo>groupId:${mvnGroupId}</echo>
+    <echo>artifactId:${mvnArtifactId}</echo>
+    <echo>bundleversion:${bundleversion}</echo>
+    <echo>luceeCoreVersion:${luceeCoreVersion}</echo>
+
+    <exec dir="source/java" executable="mvn" failonerror="true">
+      <arg value="clean"/>
+      <arg value="${effective.goal}"/>
+      <arg value="-B"/>
+      <arg value="-e"/>
+      <arg value="-Drevision=${bundleversion}"/>
+      <arg value="-Dlucee.version=${luceeCoreVersion}"/>
+      <arg value="-DperformRelease=${is.deploy}"/>
+      <arg value="--settings"/>
+      <arg value="maven-settings.xml"/>
+      <!-- credentials as system properties, read from the environment by the root pom.xml -->
+      <arg value="-Dmaven.username=${maven.username}"/>
+      <arg value="-Dmaven.password=${maven.password}"/>
+      <arg value="-Dgpg.passphrase=${gpg.passphrase}"/>
+    </exec>
+
+    <!-- copy the runtime dependencies (not the provided Lucee core) in repository layout -->
+    <exec dir="source/java" executable="mvn" failonerror="true">
+      <arg value="-B"/>
+      <arg value="-DoutputDirectory=${temp}/dependency"/>
+      <arg value="-Dmdep.copyPom=true"/>
+      <arg value="-Dmdep.useRepositoryLayout=true"/>
+      <arg value="-DexcludeScope=provided"/>
+      <arg value="-Drevision=${bundleversion}"/>
+      <arg value="-Dlucee.version=${luceeCoreVersion}"/>
+      <arg value="dependency:copy-dependencies"/>
+    </exec>
+
+    <!-- parent POMs are needed to resolve the dependency POMs offline -->
+    <exec executable="bash" failonerror="true">
+      <arg value="${basedir}/copy-parent-poms.sh"/>
+      <arg value="${temp}/dependency"/>
+    </exec>
+  </target>
+
+  <target name="copy-dependencies" depends="maven-build">
+    <property name="mvnDir" location="${dist}/extension/maven/${mvnGroupPath}/${mvnArtifactId}/${bundleversion}"/>
+    <mkdir dir="${mvnDir}"/>
+
+    <!-- the jar built by Maven -->
+    <copy file="source/java/target/${mvnArtifactId}-${bundleversion}.jar" tofile="${mvnDir}/${mvnArtifactId}-${bundleversion}.jar" failonerror="true"/>
+    <!-- the flattened POM (resolved version, dependency list), the same one that is published -->
+    <copy file="source/java/.flattened-pom.xml" tofile="${mvnDir}/${mvnArtifactId}-${bundleversion}.pom" failonerror="true"/>
+
+    <!-- all runtime dependencies -->
+    <copy todir="${dist}/extension/maven">
+      <fileset dir="${temp}/dependency">
+        <include name="**/*.jar"/>
+        <include name="**/*.pom"/>
       </fileset>
     </copy>
+  </target>
 
-
+  <target name="createManifest" depends="copy-dependencies" description="create MANIFEST.MF file" >
     <tstamp>
-     <format property="NOW" pattern="yyyy-MM-dd HH:mm:ss" />
+      <format property="NOW" pattern="yyyy-MM-dd HH:mm:ss" />
     </tstamp>
-
     <echo file="${dist}/extension/META-INF/MANIFEST.MF">Manifest-Version: 1.0
 Built-Date: ${NOW}
 version: "${bundleversion}"
@@ -66,67 +115,12 @@ release-type: ${releaseType}
 start-bundles: false
 </echo>
   </target>
-  
 
-
-  <target name="compile" depends="copy"
-        description="compile the source " >
-    <!-- Compile ACF-Infinspan source -->
-    <javac srcdir="${temp}" source="1.8" target="1.8" destdir="${build}" debug="true" debuglevel="lines,vars,source">
-      <classpath refid="classpath" />
-    </javac>
-  </target>
-
-  <target name="dist" depends="compile"
-        description="generate the distribution" >
-    
- 
-    <!-- Put everything in ${build} into .jar file -->
-    <jar 
-    	jarfile="${dist}/extension/jars/${filename}-${bundleversion}.jar" basedir="${build}"  manifest="${src}/META-INF/MANIFEST.MF">
-      <manifest>
-        <attribute name="Built-Date" value="${NOW}"/>
-        <attribute name="Bundle-SymbolicName" value="${bundlename}"/>
-        <attribute name="Bundle-Version" value="${bundleversion}"/>
-
-      </manifest>
-    </jar>
+  <target name="dist" depends="createManifest" description="generate the distribution" >
 
     <!-- copy the flds necessary -->
-    <copy 
-      file="${fld}/function.fld" 
-      tofile="${dist}/extension/flds/argon2-functions.fld" />
-
-    <replaceregexp 
-      file="${dist}/extension/flds/argon2-functions.fld" 
-      match="\{bundle-name\}" 
-      replace="${bundlename}" 
-      byline="true"/>
-    <replaceregexp 
-      file="${dist}/extension/flds/argon2-functions.fld" 
-      match="\{bundle-version\}" 
-      replace="${bundleversion}" 
-      byline="true"/>
-
-
-    <!-- copy the jars necessary -->
-    <copy todir="${dist}/extension/jars">
-      <fileset dir="${lib}">
-        <include name="**/*.jar"/>
-        <exclude name="**/javax.*"/>
-        <exclude name="**/jsp-*"/>
-        <exclude name="**/lucee.jar"/>
-        <exclude name="**/org.apache.felix.framework-*"/>
-
-        <!-- we exclude this because this is part of the Lucee core and in worst case it is loaded on the fly -->
-        <exclude name="**/httpcomponents-*"/>
-        <exclude name="**/org.lucee.httpcomponents.*"/>
-        <!-- <exclude name="**/org.apache.commons.codec-*"/> -->
-        <exclude name="**/commons-codec-*"/>
-        <exclude name="**/log4j-*"/>
-        <exclude name="**/javax-mail-activation-*"/>
-      </fileset>
-    </copy>
+    <copy file="${fld}/function.fld" tofile="${dist}/extension/flds/argon2-functions.fld" />
+    <replaceregexp file="${dist}/extension/flds/argon2-functions.fld" match="\{maven\}" replace="${mvnGroupId}:${mvnArtifactId}:${bundleversion}" byline="true"/>
 
     <!-- copy the logo -->
     <copy todir="${dist}/extension/META-INF">
@@ -135,16 +129,21 @@ start-bundles: false
       </fileset>
     </copy>
 
-    <!-- Zip everything  -->
-     <zip destfile="${dist}/${filename}-${bundleversion}.lex">
-        <zipfileset dir="${dist}/extension"/>
+    <!-- Zip everything -->
+    <zip destfile="${dist}/${filename}-${bundleversion}.lex">
+      <zipfileset dir="${dist}/extension"/>
     </zip>
-		
+
+    <!-- Lite artifact: same but without bundled Maven dependencies -->
+    <zip destfile="${dist}/${filename}-${bundleversion}.lite.lex">
+      <zipfileset dir="${dist}/extension">
+        <exclude name="maven/**"/>
+      </zipfileset>
+    </zip>
   </target>
-	<target name="clean"  depends="dist" description="clean up" >
-		<!-- Delete the ${build} and ${dist} directory trees -->
-		<delete dir="${build}"/>
-		<delete dir="${temp}"/>
-	</target>
+
+  <target name="clean" depends="dist" description="clean up" >
+    <delete dir="${temp}"/>
+  </target>
 
 </project>
